@@ -3,6 +3,9 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
+# Install openssl — required by Prisma engine on Alpine (musl)
+RUN apk add --no-cache openssl
+
 # Copy package files
 COPY package.json package-lock.json ./
 
@@ -23,8 +26,8 @@ FROM node:20-alpine AS production
 
 WORKDIR /app
 
-# Install dumb-init for proper PID 1 signal handling
-RUN apk add --no-cache dumb-init
+# Install dumb-init for proper PID 1 signal handling + openssl for Prisma
+RUN apk add --no-cache dumb-init openssl
 
 ENV NODE_ENV=production
 
