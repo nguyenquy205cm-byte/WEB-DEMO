@@ -1,0 +1,158 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+enum PaymentMethod {
+  CARD
+  PAYPAL
+  CASH
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  name      String?
+  role      Role     @default(USER)
+  createdAt DateTime @default(now())
+
+  cart      Cart?
+  orders    Order[]
+  reviews   Review[]
+}
+
+model Brand {
+  id        Int       @id @default(autoincrement())
+  name      String    @unique
+  slug      String    @unique
+  createdAt DateTime  @default(now())
+
+  products  Product[]
+}
+
+model Category {
+  id        Int               @id @default(autoincrement())
+  name      String            @unique
+  slug      String            @unique
+  createdAt DateTime          @default(now())
+
+  productCategories ProductCategory[]
+}
+
+model Product {
+  id          Int               @id @default(autoincrement())
+  name        String
+  slug        String            @unique
+  description String?
+  price       Decimal           @db.Decimal(10,2)
+  stock       Int               @default(0)
+  sku         String?           @unique
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  brand     Brand   @relation(fields: [brandId], references: [id])
+  brandId   Int
+
+  images    ProductImage[]
+  categories ProductCategory[]
+  reviews   Review[]
+  orderItems OrderItem[]
+  cartItems  CartItem[]
+}
+
+model ProductImage {
+  id        Int      @id @default(autoincrement())
+  product   Product  @relation(fields: [productId], references: [id])
+  productId Int
+  url       String
+  alt       String?
+  blobName  String
+  isMain    Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model ProductCategory {
+  product   Product  @relation(fields: [productId], references: [id])
+  productId Int
+  category  Category @relation(fields: [categoryId], references: [id])
+  categoryId Int
+
+  @@id([productId, categoryId])
+}
+
+model Cart {
+  id        Int        @id @default(autoincrement())
+  user      User       @relation(fields: [userId], references: [id])
+  userId    Int        @unique
+  items     CartItem[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model CartItem {
+  id        Int      @id @default(autoincrement())
+  cart      Cart     @relation(fields: [cartId], references: [id])
+  cartId    Int
+  product   Product  @relation(fields: [productId], references: [id])
+  productId Int
+  quantity  Int      @default(1)
+  unitPrice Decimal  @db.Decimal(10,2)
+
+  @@unique([cartId, productId])
+}
+
+model Order {
+  id              Int         @id @default(autoincrement())
+  user            User        @relation(fields: [userId], references: [id])
+  userId          Int
+  total           Decimal     @db.Decimal(10,2)
+  status          OrderStatus @default(PENDING)
+  paymentMethod   PaymentMethod?
+  placedAt        DateTime    @default(now())
+  shippingAddress String?
+
+  items OrderItem[]
+}
+
+model OrderItem {
+  id        Int      @id @default(autoincrement())
+  order     Order    @relation(fields: [orderId], references: [id])
+  orderId   Int
+  product   Product  @relation(fields: [productId], references: [id])
+  productId Int
+  quantity  Int
+  unitPrice Decimal  @db.Decimal(10,2)
+}
+
+model Review {
+  id        Int      @id @default(autoincrement())
+  product   Product  @relation(fields: [productId], references: [id])
+  productId Int
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  rating    Int
+  title     String?
+  content   String?
+  createdAt DateTime @default(now())
+
+  @@unique([productId, userId])
+}
+
