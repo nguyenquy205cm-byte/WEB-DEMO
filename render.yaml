@@ -1,9 +1,10 @@
-staticSites:
-  - name: sneaker-store-frontend
-    runtime: node
+services:
+  - type: web
+    name: sneaker-store-frontend
+    runtime: static
     rootDir: frontend
     buildCommand: npm install && npm run build
-    publishPath: dist
+    staticPublishPath: dist
     routes:
       - type: rewrite
         source: /*
