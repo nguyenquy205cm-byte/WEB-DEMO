@@ -85,18 +85,20 @@ async function main() {
     // Add 2 images per product
     await prisma.productImage.createMany({
       data: [
-        {
-          productId: product.id,
-          url: `https://example.com/images/${product.slug}-1.jpg`,
-          alt: `${product.name} main`,
-          isMain: true,
-        },
-        {
-          productId: product.id,
-          url: `https://example.com/images/${product.slug}-2.jpg`,
-          alt: `${product.name} secondary`,
-          isMain: false,
-        },
+                {
+                    productId: product.id,
+                    url: `https://example.com/images/${product.slug}-1.jpg`,
+                    alt: `${product.name} main`,
+                    blobName: `${product.slug}-1.jpg`,
+                    isMain: true,
+                },
+                {
+                    productId: product.id,
+                    url: `https://example.com/images/${product.slug}-2.jpg`,
+                    alt: `${product.name} secondary`,
+                    blobName: `${product.slug}-2.jpg`,
+                    isMain: false,
+                },
       ],
     });
 
