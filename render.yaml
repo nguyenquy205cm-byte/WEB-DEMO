@@ -17,7 +17,7 @@ services:
     dockerfilePath: ./Dockerfile
     plan: free
     healthCheckPath: /health
-    dockerCommand: npx prisma migrate deploy && node prisma/seed.js && node dist/index.js
+    dockerCommand: npx prisma migrate resolve --rolled-back 20260806_init || true; npx prisma migrate deploy && node prisma/seed.js && node dist/index.js
     envVars:
       - key: DATABASE_URL
         fromDatabase:
