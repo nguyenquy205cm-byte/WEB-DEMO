@@ -1,13 +1,15 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { FiShoppingBag, FiMenu, FiX } from 'react-icons/fi';
+import { FiShoppingBag, FiMenu, FiX, FiLogOut } from 'react-icons/fi';
 import SearchBar from './SearchBar';
 import { products } from '../services/products';
 import { useCart } from '../context/CartContext';
+import { useAuth } from '../context/AuthContext';
 
 function Header() {
   const [open, setOpen] = useState(false);
   const { items } = useCart();
+  const { user, logout } = useAuth();
   const cartCount = items.reduce((count, item) => count + item.quantity, 0);
 
   return (
@@ -27,12 +29,25 @@ function Header() {
         </div>
 
         <div className="hidden items-center gap-4 md:flex">
-          <Link to="/login" className="rounded-full border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-orange-500 hover:text-orange-500">
-            Login
-          </Link>
-          <Link to="/register" className="rounded-full bg-orange-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-orange-600">
-            Register
-          </Link>
+          {user ? (
+            <>
+              <Link to="/profile" className="rounded-full border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-orange-500 hover:text-orange-500">
+                {user.name}
+              </Link>
+              <button onClick={logout} className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-red-400 hover:text-red-500">
+                <FiLogOut /> Đăng xuất
+              </button>
+            </>
+          ) : (
+            <>
+              <Link to="/login" className="rounded-full border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-orange-500 hover:text-orange-500">
+                Login
+              </Link>
+              <Link to="/register" className="rounded-full bg-orange-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-orange-600">
+                Register
+              </Link>
+            </>
+          )}
           <Link to="/cart" className="relative inline-flex items-center rounded-full border border-slate-200 px-3 py-2 text-slate-700 transition hover:border-orange-500 hover:text-orange-500">
             <FiShoppingBag className="mr-2" />
             {cartCount}
@@ -51,12 +66,20 @@ function Header() {
             <Link to="/products" onClick={() => setOpen(false)}>Products</Link>
             <Link to="/cart" onClick={() => setOpen(false)}>Cart</Link>
             <Link to="/profile" onClick={() => setOpen(false)}>Profile</Link>
-            <Link to="/login" onClick={() => setOpen(false)} className="rounded-full border border-slate-200 px-4 py-2 text-center text-slate-700">
-              Login
-            </Link>
-            <Link to="/register" onClick={() => setOpen(false)} className="rounded-full bg-orange-500 px-4 py-2 text-center text-white">
-              Register
-            </Link>
+            {user ? (
+              <button onClick={() => { logout(); setOpen(false); }} className="rounded-full border border-slate-200 px-4 py-2 text-center text-slate-700">
+                Đăng xuất ({user.name})
+              </button>
+            ) : (
+              <>
+                <Link to="/login" onClick={() => setOpen(false)} className="rounded-full border border-slate-200 px-4 py-2 text-center text-slate-700">
+                  Login
+                </Link>
+                <Link to="/register" onClick={() => setOpen(false)} className="rounded-full bg-orange-500 px-4 py-2 text-center text-white">
+                  Register
+                </Link>
+              </>
+            )}
           </nav>
         </div>
       )}
