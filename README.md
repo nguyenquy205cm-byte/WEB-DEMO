@@ -37,7 +37,7 @@ Hệ thống được đóng gói và chạy bằng **Docker Compose** trên m�
         │   └──────────┘      └──────┬──────┘  │
         │                            │         │
         │              ┌─────────────┴──────┐  │
-        │              │ MySQL (Prisma ORM) │  │
+        │              │ PostgreSQL (Prisma)│  │
         │              │ Redis (cache)      │  │
         │              └────────────────────┘  │
         └──────────────────────────────────────┘
@@ -51,7 +51,7 @@ Hệ thống được đóng gói và chạy bằng **Docker Compose** trên m�
 |---|---|---|---|
 | `frontend` | `web-demo-frontend` (Nginx 1.27) | 80 → 80 | Phục vụ bundle React đã build, proxy `/api` sang backend, SPA fallback |
 | `backend` | `web-demo-backend` (Node 20) | 4000 → 4000 | REST API (auth, products, cart, orders, users) |
-| `db` | `mysql:8.0` | 3306 → 3306 | Cơ sở dữ liệu `sneakerstore`, có volume bền vững |
+| `db` | `postgres:16-alpine` | 5432 → 5432 | Cơ sở dữ liệu `sneakerstore`, có volume bền vững |
 | `redis` | `redis:7-alpine` | 6379 → 6379 | Cache, có volume bền vững |
 | `migrate` | `web-demo-migrate` | – | Job chạy `prisma migrate deploy` khi khởi tạo |
 
@@ -71,8 +71,8 @@ Hệ thống được đóng gói và chạy bằng **Docker Compose** trên m�
 | Azure Blob Storage | Azure | Lưu trữ ảnh sản phẩm (backend upload qua `AZURE_STORAGE_CONNECTION_STRING`) |
 | Azure Public IP | Azure | Địa chỉ truy cập website từ Internet |
 | GitHub | GitHub | Lưu trữ mã nguồn và đồng bộ code lên server qua `git pull` |
-| MySQL (Docker) | Tự quản | DB chính — chạy trong container trên VM |
+| PostgreSQL (Docker) | Tự quản | DB chính — chạy trong container trên VM |
 | Redis (Docker) | Tự quản | Cache — chạy trong container trên VM |
 | Nginx (Docker) | Tự quản | Web server phục vụ frontend và reverse proxy |
 
-> **Ghi chú:** thư mục `infra/` chứa file Bicep scaffold cho phương án dùng dịch vụ PaaS Azure (App Service, Azure SQL, Azure Cache for Redis, Key Vault, Application Insights, Blob Storage). Hướng đã triển khai thực tế là **Docker Compose trên Azure VM** như bảng trên.
+> **Ghi chú:** thư mục `infra/` chứa file Bicep scaffold cho phương án dùng dịch vụ PaaS Azure (App Service, Azure SQL, Azure Cache for Redis, Key Vault, Application Insights, Blob Storage). Ngoài ra còn có thể triển khai tự động lên **Render** qua file `render.yaml` (Static Site + Web Service + PostgreSQL free). Hướng triển khai thực tế có thể chọn **Docker Compose trên Azure VM** hoặc **Render Blueprint**.
