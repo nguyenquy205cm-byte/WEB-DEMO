@@ -3,6 +3,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const client_1 = require("@prisma/client");
 const prisma = new client_1.PrismaClient();
 async function main() {
+    const existing = await prisma.brand.count();
+    if (existing > 0) {
+        console.log("DB already seeded, skipping");
+        return;
+    }
     // Brands
     const brandsData = [
         { name: "Nike", slug: "nike" },

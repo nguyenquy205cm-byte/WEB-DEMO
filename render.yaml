@@ -9,3 +9,23 @@ services:
       - type: rewrite
         source: /*
         destination: /index.html
+
+  - type: web
+    name: sneaker-store-backend
+    runtime: docker
+    rootDir: backend
+    dockerfilePath: ./Dockerfile
+    plan: free
+    healthCheckPath: /health
+    dockerCommand: npx prisma migrate deploy && node prisma/seed.js && node dist/index.js
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: REDIS_URL
+        sync: false
+      - key: AZURE_STORAGE_CONNECTION_STRING
+        sync: false
+      - key: AZURE_STORAGE_CONTAINER
+        sync: false

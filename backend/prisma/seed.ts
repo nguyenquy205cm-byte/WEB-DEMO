@@ -3,6 +3,11 @@ import { PrismaClient, Prisma } from "@prisma/client";
 const prisma = new PrismaClient();
 
 async function main() {
+  const existing = await prisma.brand.count();
+  if (existing > 0) {
+    console.log("DB already seeded, skipping");
+    return;
+  }
   // Brands
   const brandsData = [
     { name: "Nike", slug: "nike" },
