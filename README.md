@@ -7,6 +7,7 @@ Tạo project bài tập lớn môn Điện toán đám mây cho website bán gi
 - `frontend/`: ứng dụng web React với Vite, TypeScript và Tailwind CSS.
 - `backend/`: API Node.js + Express với TypeScript và Prisma ORM.
 - `infra/`: scaffold hạ tầng Azure bằng Bicep.
+- `docker-compose.yml`: định nghĩa toàn bộ dịch vụ chạy bằng Docker.
 
 ## Thực hiện
 1. Mở terminal tại thư mục gốc `d:\Điện toán\WEB-DEMO`
@@ -17,11 +18,61 @@ Tạo project bài tập lớn môn Điện toán đám mây cho website bán gi
    - `cd frontend && npm run dev`
    - `cd ../backend && npm run dev`
 
-## Hạ tầng Azure chuẩn bị
-- Azure Static Web Apps cho frontend tĩnh
-- Azure App Service cho backend
-- Azure SQL Database
-- Azure Blob Storage cho ảnh sản phẩm
-- Azure Redis Cache
-- Azure Key Vault
-- Azure Monitor / Application Insights
+## Kiến trúc triển khai (Production)
+
+Hệ thống được đóng gói và chạy bằng **Docker Compose** trên một **Azure Virtual Machine (Ubuntu)**:
+
+```
+                        Internet
+                           |
+                           | HTTP :80 / HTTPS
+                           v
+        ┌──────────────────────────────────────┐
+        │   Azure VM Ubuntu (Docker Engine)    │
+        │                                      │
+        │   ┌──────────┐      ┌─────────────┐  │
+        │   │ Frontend │ ───► │ Backend API │  │
+        │   │ Nginx    │ /api │ Node/Express│  │
+        │   │  :80     │      │    :4000    │  │
+        │   └──────────┘      └──────┬──────┘  │
+        │                            │         │
+        │              ┌─────────────┴──────┐  │
+        │              │ MySQL (Prisma ORM) │  │
+        │              │ Redis (cache)      │  │
+        │              └────────────────────┘  │
+        └──────────────────────────────────────┘
+                           │
+                           ▼
+              Azure Blob Storage (ảnh sản phẩm)
+```
+
+### Các container trong `docker-compose.yml`
+| Service | Image | Cổng | Vai trò |
+|---|---|---|---|
+| `frontend` | `web-demo-frontend` (Nginx 1.27) | 80 → 80 | Phục vụ bundle React đã build, proxy `/api` sang backend, SPA fallback |
+| `backend` | `web-demo-backend` (Node 20) | 4000 → 4000 | REST API (auth, products, cart, orders, users) |
+| `db` | `mysql:8.0` | 3306 → 3306 | Cơ sở dữ liệu `sneakerstore`, có volume bền vững |
+| `redis` | `redis:7-alpine` | 6379 → 6379 | Cache, có volume bền vững |
+| `migrate` | `web-demo-migrate` | – | Job chạy `prisma migrate deploy` khi khởi tạo |
+
+### Luồng triển khai
+1. Push source lên GitHub.
+2. SSH vào Azure VM: `ssh azureuser@<public-ip>`.
+3. Kéo code mới: `git pull`.
+4. Build và chạy: `docker compose up -d --build`.
+5. Truy cập website qua IP công khai của VM.
+
+## Dịch vụ Cloud đã sử dụng
+
+| Dịch vụ | Nhà cung cấp | Công dụng |
+|---|---|---|
+| Azure Virtual Machine (Ubuntu) | Azure | Máy chủ chạy toàn bộ container Docker |
+| Azure Network Security Group (NSG) | Azure | Mở/mở cổng truy cập (22/SSH, 80/HTTP) cho VM |
+| Azure Blob Storage | Azure | Lưu trữ ảnh sản phẩm (backend upload qua `AZURE_STORAGE_CONNECTION_STRING`) |
+| Azure Public IP | Azure | Địa chỉ truy cập website từ Internet |
+| GitHub | GitHub | Lưu trữ mã nguồn và đồng bộ code lên server qua `git pull` |
+| MySQL (Docker) | Tự quản | DB chính — chạy trong container trên VM |
+| Redis (Docker) | Tự quản | Cache — chạy trong container trên VM |
+| Nginx (Docker) | Tự quản | Web server phục vụ frontend và reverse proxy |
+
+> **Ghi chú:** thư mục `infra/` chứa file Bicep scaffold cho phương án dùng dịch vụ PaaS Azure (App Service, Azure SQL, Azure Cache for Redis, Key Vault, Application Insights, Blob Storage). Hướng đã triển khai thực tế là **Docker Compose trên Azure VM** như bảng trên.
