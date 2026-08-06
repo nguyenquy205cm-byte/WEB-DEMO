@@ -1,5 +1,4 @@
-import Banner from '../components/Banner';
-import Navbar from '../components/Navbar';
+import { Link } from 'react-router-dom';
 import ProductCard from '../components/ProductCard';
 import { products } from '../services/products';
 
@@ -24,9 +23,9 @@ function Home() {
               <a href="#featured" className="rounded-full bg-orange-500 px-6 py-3 text-sm font-semibold uppercase tracking-[0.18em] text-white transition hover:bg-orange-600">
                 Khám phá ngay
               </a>
-              <a href="#products" className="rounded-full border border-white/20 bg-white/5 px-6 py-3 text-sm font-semibold uppercase tracking-[0.18em] text-white transition hover:border-orange-500 hover:text-orange-500">
+              <Link to="/products" className="rounded-full border border-white/20 bg-white/5 px-6 py-3 text-sm font-semibold uppercase tracking-[0.18em] text-white transition hover:border-orange-500 hover:text-orange-500">
                 Xem bộ sưu tập
-              </a>
+              </Link>
             </div>
           </div>
           <div className="rounded-[32px] bg-slate-900 p-6 shadow-xl sm:p-10">

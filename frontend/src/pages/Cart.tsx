@@ -1,9 +1,10 @@
 import { Link } from 'react-router-dom';
+import { FiPlus, FiMinus } from 'react-icons/fi';
 import { useCart } from '../context/CartContext';
 import { formatCurrency } from '../utils/format';
 
 function Cart() {
-  const { items, removeFromCart, clearCart, totalPrice } = useCart();
+  const { items, updateQuantity, removeFromCart, clearCart, totalPrice } = useCart();
 
   return (
     <div className="space-y-8">
@@ -38,7 +39,15 @@ function Cart() {
                     <div>
                       <h3 className="text-lg font-semibold text-slate-900">{item.product.name}</h3>
                       <p className="mt-1 text-sm text-slate-600">{item.product.brand}</p>
-                      <p className="mt-2 text-sm text-slate-600">Số lượng: {item.quantity}</p>
+                      <div className="mt-3 inline-flex items-center gap-3 rounded-full border border-slate-200 bg-slate-50 px-2 py-1">
+                        <button onClick={() => updateQuantity(item.product.id, item.quantity - 1)} aria-label="Giảm số lượng" className="rounded-full p-1.5 text-slate-600 transition hover:bg-white hover:text-orange-500">
+                          <FiMinus size={14} />
+                        </button>
+                        <span className="w-6 text-center text-sm font-semibold text-slate-900">{item.quantity}</span>
+                        <button onClick={() => updateQuantity(item.product.id, item.quantity + 1)} aria-label="Tăng số lượng" className="rounded-full p-1.5 text-slate-600 transition hover:bg-white hover:text-orange-500">
+                          <FiPlus size={14} />
+                        </button>
+                      </div>
                     </div>
                   </div>
                   <div className="flex flex-col items-start gap-3 text-sm text-slate-700 sm:items-end">

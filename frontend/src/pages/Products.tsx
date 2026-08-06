@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react';
 import ProductCard from '../components/ProductCard';
-import Navbar from '../components/Navbar';
 import { products } from '../services/products';
 import type { Product } from '../types/product';
 
@@ -68,6 +67,12 @@ function Products() {
               <ProductCard key={product.id} product={product} />
             ))}
           </div>
+          {filteredProducts.length === 0 && (
+            <div className="rounded-[32px] border border-dashed border-slate-300 bg-slate-50 p-10 text-center">
+              <h2 className="text-xl font-semibold text-slate-900">Không tìm thấy sản phẩm</h2>
+              <p className="mt-2 text-sm text-slate-600">Thử đổi bộ lọc hoặc từ khóa tìm kiếm khác.</p>
+            </div>
+          )}
         </div>
         <aside className="space-y-6 rounded-[32px] bg-white p-6 shadow-sm">
           <div className="rounded-3xl border border-slate-200 bg-slate-50 p-5">

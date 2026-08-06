@@ -9,6 +9,7 @@ interface CartItem {
 interface CartContextValue {
   items: CartItem[];
   addToCart: (product: Product) => void;
+  updateQuantity: (productId: string, quantity: number) => void;
   removeFromCart: (productId: string) => void;
   clearCart: () => void;
   totalPrice: number;
@@ -37,6 +38,18 @@ export function CartProvider({ children }: CartProviderProps) {
     });
   };
 
+  const updateQuantity = (productId: string, quantity: number) => {
+    if (quantity <= 0) {
+      setItems(current => current.filter(item => item.product.id !== productId));
+      return;
+    }
+    setItems(current =>
+      current.map(item =>
+        item.product.id === productId ? { ...item, quantity } : item
+      )
+    );
+  };
+
   const removeFromCart = (productId: string) => {
     setItems(current => current.filter(item => item.product.id !== productId));
   };
@@ -49,7 +62,7 @@ export function CartProvider({ children }: CartProviderProps) {
   );
 
   return (
-    <CartContext.Provider value={{ items, addToCart, removeFromCart, clearCart, totalPrice }}>
+    <CartContext.Provider value={{ items, addToCart, updateQuantity, removeFromCart, clearCart, totalPrice }}>
       {children}
     </CartContext.Provider>
   );

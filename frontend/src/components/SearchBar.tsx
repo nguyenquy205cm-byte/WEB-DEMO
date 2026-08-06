@@ -1,5 +1,6 @@
 import { useState, type ChangeEvent } from 'react';
 import { FiSearch } from 'react-icons/fi';
+import { Link } from 'react-router-dom';
 import type { Product } from '../types/product';
 
 interface SearchBarProps {
@@ -33,9 +34,14 @@ function SearchBar({ products }: SearchBarProps) {
         <p className="text-sm font-medium text-slate-600">Kết quả nổi bật</p>
         <div className="mt-3 grid gap-2 text-sm text-slate-700">
           {filtered.slice(0, 4).map(product => (
-            <div key={product.id} className="rounded-xl bg-slate-50 px-3 py-2">
+            <Link
+              key={product.id}
+              to={`/products/${product.id}`}
+              onClick={() => setQuery('')}
+              className="rounded-xl bg-slate-50 px-3 py-2 transition hover:bg-orange-50 hover:text-orange-600"
+            >
               {product.brand} · {product.name}
-            </div>
+            </Link>
           ))}
           {filtered.length === 0 && <div className="rounded-xl bg-slate-50 px-3 py-2 text-slate-500">Không có sản phẩm khớp.</div>}
         </div>
