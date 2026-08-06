@@ -3,11 +3,18 @@ import { PrismaClient, Prisma } from "@prisma/client";
 const prisma = new PrismaClient();
 
 async function main() {
-  const existing = await prisma.brand.count();
-  if (existing > 0) {
-    console.log("DB already seeded, skipping");
-    return;
-  }
+  // Reset all tables so re-running the seed always yields a full, clean dataset
+  await prisma.orderItem.deleteMany();
+  await prisma.order.deleteMany();
+  await prisma.cartItem.deleteMany();
+  await prisma.cart.deleteMany();
+  await prisma.review.deleteMany();
+  await prisma.productCategory.deleteMany();
+  await prisma.productImage.deleteMany();
+  await prisma.product.deleteMany();
+  await prisma.category.deleteMany();
+  await prisma.brand.deleteMany();
+  await prisma.user.deleteMany();
   // Brands
   const brandsData = [
     { name: "Nike", slug: "nike" },
