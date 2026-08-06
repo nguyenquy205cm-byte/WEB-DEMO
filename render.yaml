@@ -17,7 +17,6 @@ services:
     dockerfilePath: ./Dockerfile
     plan: free
     healthCheckPath: /health
-    dockerCommand: npx prisma migrate deploy && node prisma/seed.js && node dist/index.js
     envVars:
       - key: DATABASE_URL
         fromDatabase:
